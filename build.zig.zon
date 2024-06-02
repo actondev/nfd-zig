@@ -1,0 +1,15 @@
+.{
+    .name = "nfd",
+    .version = "1.0.0",
+
+    .dependencies = .{
+        .nfd_src = .{
+            // devel branch, has gtk focus fix
+            .url = "https://github.com/mlabbe/nativefiledialog/archive/2850c97af02e6b4cce6ffb91a0445acb5eb9b241.tar.gz",
+            .hash = "12204d3bfb806ee433ddae3248f6f380cff3105a45531fb364cb447a24d3bc69ff99",
+        },
+    },
+    .paths = .{
+        "",
+    },
+}

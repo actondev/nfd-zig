@@ -1,23 +1,34 @@
 const std = @import("std");
 
-pub fn build(b: *std.Build) !void {
+pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
+    const nfd_dep = b.dependency("nfd_src", .{});
+
     const nfd_mod = b.addModule("nfd", .{
-        .root_source_file = .{ .path = "src/lib.zig" },
+        .root_source_file = b.path("src/lib.zig"),
         .target = target,
         .optimize = optimize,
         .link_libc = true,
     });
 
     const cflags = [_][]const u8{"-Wall"};
-    nfd_mod.addIncludePath(.{ .path = "nativefiledialog/src/include" });
-    nfd_mod.addCSourceFile(.{ .file = .{ .path = "nativefiledialog/src/nfd_common.c" }, .flags = &cflags });
+    nfd_mod.addIncludePath(nfd_dep.path("src/include"));
+    nfd_mod.addCSourceFile(.{ .file = nfd_dep.path("src/nfd_common.c"), .flags = &cflags });
     switch (target.result.os.tag) {
-        .macos => nfd_mod.addCSourceFile(.{ .file = .{ .path = "nativefiledialog/src/nfd_cocoa.m" }, .flags = &cflags }),
-        .windows => nfd_mod.addCSourceFile(.{ .file = .{ .path = "nativefiledialog/src/nfd_win.cpp" }, .flags = &cflags }),
-        .linux => nfd_mod.addCSourceFile(.{ .file = .{ .path = "nativefiledialog/src/nfd_gtk.c" }, .flags = &cflags }),
+        .macos => nfd_mod.addCSourceFile(.{
+            .file = nfd_dep.path("src/nfd_cocoa.m"),
+            .flags = &cflags,
+        }),
+        .windows => nfd_mod.addCSourceFile(.{
+            .file = nfd_dep.path("src/nfd_win.cpp"),
+            .flags = &cflags,
+        }),
+        .linux => nfd_mod.addCSourceFile(.{
+            .file = nfd_dep.path("src/nfd_gtk.c"),
+            .flags = &cflags,
+        }),
         else => @panic("unsupported OS"),
     }
 
@@ -40,11 +51,11 @@ pub fn build(b: *std.Build) !void {
 
     var demo = b.addExecutable(.{
         .name = "nfd-demo",
-        .root_source_file = .{ .path = "src/demo.zig" },
+        .root_source_file = b.path("src/demo.zig"),
         .target = target,
         .optimize = optimize,
     });
-    demo.addIncludePath(.{ .path = "nativefiledialog/src/include" });
+    demo.addIncludePath(nfd_dep.path("src/include"));
     demo.root_module.addImport("nfd", nfd_mod);
     b.installArtifact(demo);
 
