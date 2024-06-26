@@ -13,21 +13,26 @@ pub fn build(b: *std.Build) void {
         .link_libc = true,
     });
 
-    const cflags = [_][]const u8{"-Wall"};
+    const cflags = switch (target.result.os.tag) {
+        // window hack, nfd has a comment about unicode, this is just to make it work (not
+        // correctly)
+        .windows => &[_][]const u8{ "-Wall", "-DUNICODE", "-D_UNICODE" },
+        else => &[_][]const u8{"-Wall"},
+    };
     nfd_mod.addIncludePath(nfd_dep.path("src/include"));
-    nfd_mod.addCSourceFile(.{ .file = nfd_dep.path("src/nfd_common.c"), .flags = &cflags });
+    nfd_mod.addCSourceFile(.{ .file = nfd_dep.path("src/nfd_common.c"), .flags = cflags });
     switch (target.result.os.tag) {
         .macos => nfd_mod.addCSourceFile(.{
             .file = nfd_dep.path("src/nfd_cocoa.m"),
-            .flags = &cflags,
+            .flags = cflags,
         }),
         .windows => nfd_mod.addCSourceFile(.{
             .file = nfd_dep.path("src/nfd_win.cpp"),
-            .flags = &cflags,
+            .flags = cflags,
         }),
         .linux => nfd_mod.addCSourceFile(.{
             .file = nfd_dep.path("src/nfd_gtk.c"),
-            .flags = &cflags,
+            .flags = cflags,
         }),
         else => @panic("unsupported OS"),
     }
