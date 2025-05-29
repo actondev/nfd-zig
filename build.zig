@@ -31,7 +31,7 @@ pub fn build(b: *std.Build) void {
             .flags = cflags,
         }),
         .linux => nfd_mod.addCSourceFile(.{
-            .file = nfd_dep.path("src/nfd_gtk.c"),
+            .file = nfd_dep.path("src/nfd_zenity.c"),
             .flags = cflags,
         }),
         else => @panic("unsupported OS"),
@@ -44,13 +44,7 @@ pub fn build(b: *std.Build) void {
             nfd_mod.linkSystemLibrary("ole32", .{});
             nfd_mod.linkSystemLibrary("uuid", .{}); // needed by MinGW
         },
-        .linux => {
-            nfd_mod.linkSystemLibrary("atk-1.0", .{});
-            nfd_mod.linkSystemLibrary("gdk-3", .{});
-            nfd_mod.linkSystemLibrary("gtk-3", .{});
-            nfd_mod.linkSystemLibrary("glib-2.0", .{});
-            nfd_mod.linkSystemLibrary("gobject-2.0", .{});
-        },
+        .linux => {},
         else => @panic("unsupported OS"),
     }
 
