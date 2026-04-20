@@ -56,7 +56,7 @@ pub fn build(b: *std.Build) void {
             .optimize = optimize,
         }),
     });
-    demo.addIncludePath(nfd_dep.path("src/include"));
+    demo.root_module.addIncludePath(nfd_dep.path("src/include"));
     demo.root_module.addImport("nfd", nfd_mod);
     b.installArtifact(demo);
 

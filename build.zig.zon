@@ -1,7 +1,7 @@
 .{
-    .name = "nfd",
+    .name = .nfd,
     .version = "1.0.0",
-
+    .fingerprint = 0xc4705658b64d847e,
     .dependencies = .{
         .nfd_src = .{
             .url = "https://github.com/actondev/nativefiledialog/archive/2aa2ea906666f90d61985fd6097603fbcbfd0458.tar.gz",
