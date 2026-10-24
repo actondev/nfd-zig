@@ -1,4 +1,5 @@
 const std = @import("std");
+const Translator = @import("translate_c").Translator;
 
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
@@ -20,6 +21,13 @@ pub fn build(b: *std.Build) void {
         else => &[_][]const u8{"-Wall"},
     };
     nfd_mod.addIncludePath(nfd_dep.path("src/include"));
+    const nfd_c: Translator = .init(b.dependency("translate_c", .{}), .{
+        .name = "nfd_c",
+        .c_source_file = nfd_dep.path("src/include/nfd.h"),
+        .target = target,
+        .optimize = optimize,
+    });
+    nfd_mod.addImport("nfd_c", nfd_c.mod);
     nfd_mod.addCSourceFile(.{ .file = nfd_dep.path("src/nfd_common.c"), .flags = cflags });
     switch (target.result.os.tag) {
         .macos => nfd_mod.addCSourceFile(.{
